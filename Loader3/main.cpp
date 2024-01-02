@@ -395,7 +395,7 @@ void display() {
     glRotatef(angle_x, 1.0f, 0.0f, 0.0f);
     glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
     //camera();
-    //drawMap();
+    drawMap();
     //drawPlayer();
     cube();
     renderScore();
@@ -573,7 +573,7 @@ int main(int argc, char **argv) {
     texture = LoadTexture("grass.bmp", 256, 256);
     texture1 = LoadTexture("raod.bmp", 256, 256);
     texture2 = LoadTexture("white.bmp", 256, 256);
-    //glutMouseFunc(mouse);
+    glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutPassiveMotionFunc(mouseMovement);
     glutKeyboardFunc(keyboard);
