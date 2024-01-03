@@ -379,6 +379,7 @@ void init() {
     //model.load("Models/MarioKart/mk_kart.obj");
     model.load("Models/Coins/Bells.obj");
     building.load("Models/Building/building.obj");
+    //building.load("Models/FTMK Building/untitled.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
 
     pos_x = model.pos_x;
