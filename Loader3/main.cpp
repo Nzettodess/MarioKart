@@ -9,6 +9,7 @@
 #include <time.h>
 #include <vector>
 #include <windows.h>
+#include <MMSystem.h>
 using namespace std;
 
 int POS_X, POS_Y;
@@ -574,6 +575,7 @@ int main(int argc, char **argv) {
     texture = LoadTexture("grass.bmp", 256, 256);
     texture1 = LoadTexture("raod.bmp", 256, 256);
     texture2 = LoadTexture("white.bmp", 256, 256);
+    PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutPassiveMotionFunc(mouseMovement);
@@ -582,4 +584,3 @@ int main(int argc, char **argv) {
     glutMainLoop();
     return 0;
 }
-//test
