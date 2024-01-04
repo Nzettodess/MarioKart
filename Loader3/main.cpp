@@ -77,6 +77,7 @@ int gameMap[MAP_SIZE][MAP_SIZE] = {
 };
 float xpos = 15.0 * 5.0, ypos = 0, zpos = 10.0, xrot = 0, yrot = 0, angle = 0.0;
 float lastx, lasty;
+float speed = 0.0, maxSpeed = 0.1, acceleration = 0.005, deceleration = 0.01;
 float positionx[100], positiony[100], positionz[100], buildX[12], buildZ[12];
 int score = 0;
 double rotate_x = 0, rotate_y = 0;
@@ -95,7 +96,7 @@ GLuint LoadTexture(const char* filename, int width, int	height)
     fread(data, width * height * 3, 1, file);
     fclose(file);
     glGenTextures(1, &texture); //generate the texture with the loaded data
-    glBindTexture(GL_TEXTURE_2D, texture); //bind the texture to it’s array
+    glBindTexture(GL_TEXTURE_2D, texture); //bind the texture to itâ€™s array
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); //set texture environment parameters
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -183,11 +184,16 @@ bool checkBuildingCollision(float playerX, float playerY, float playerZ,
     }
     return false; // No collision with the building
 }
-void updatePlayerPosition(float deltaX, float deltaY, float deltaZ)
+void updatePlayerPosition(void)
 {
-    float newX = xpos + deltaX;
-    float newY = ypos + deltaY;
-    float newZ = zpos + deltaZ;
+    float yrotrad = ((rotate_y) / 180 * 3.141592654f);
+
+    float moveX = speed * sin(yrotrad) + 0.0 * cos(yrotrad);
+    float moveZ = speed * cos(yrotrad) - 0.0 * sin(yrotrad);
+
+    float newX = xpos + moveX;
+    float newZ = zpos + moveZ;
+    float newY = ypos;
     // Check bounds to prevent going out of the map
     if (newX > (MAP_SIZE - 1) * 5.0 - 0.5) {
         newX = (MAP_SIZE - 1) * 5.0 - 0.5;
@@ -225,6 +231,8 @@ void updatePlayerPosition(float deltaX, float deltaY, float deltaZ)
     xpos = newX;
     //ypos = newY;
     zpos = newZ;
+
+    glutPostRedisplay();
 }
 void cube(void)
 {
@@ -235,7 +243,7 @@ void cube(void)
             glPushMatrix();
             //glTranslated(positionx[i], 0.0, positionz[i]);
             glColor3f(1.0, 1.0, 0.0);
-            model.draw(positionx[i], 0.0, positionz[i], 20.0, angle + 90.0, 90.0, 90.0);//square(); 
+            model.draw(positionx[i], 0.0, positionz[i], 1.0, angle + 90.0, 90.0, 90.0);
             glPopMatrix();
         }
         else
@@ -256,15 +264,15 @@ void cube(void)
 void drawBuilding(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
 {
     glPushMatrix();
-    glColor3f(0.2f, 0.2f, 0.2f);
+    glColor3f(0.5f, 0.5f, 0.5f);
     building.draw(x, y, z, scale, angleX, angleY, angleZ);
     glPopMatrix();
 }
 void drawPlayer(void)
 {
     glPushMatrix();
-    glColor3f(0.0f, 0.0f, 0.2f);
-    //player.draw(xpos, ypos, zpos, 1.0, 180.0, yrot, 0.0);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
     //player.draw();
     glPopMatrix();
 }
@@ -317,7 +325,7 @@ void camera(void)
     //glTranslated(-xpos, -ypos, -zpos);
     // Calculate the position of the camera in a third-person view
     float cameraDistance = 3.0; // adjust this distance as needed
-    float cameraHeight = 1.0;   // adjust this height as needed
+    float cameraHeight = 0.0;   // adjust this height as needed
 
     float xCam = xpos - cameraDistance * sin(yrot * (3.14159265 / 180.0));
     float zCam = zpos - cameraDistance * cos(yrot * (3.14159265 / 180.0));
@@ -379,9 +387,10 @@ void init() {
 
     //model.load("Models/MarioKart/mk_kart.obj");
     model.load("Models/Coins/Bells.obj");
-    building.load("Models/Building/building.obj");
+    //building.load("Models/Building/building.obj");
     //building.load("Models/FTMK Building/untitled.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
+    //player.load("Models/Building/building.obj");
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -396,107 +405,38 @@ void display() {
     glTranslatef(pos_x, pos_y, pos_z);
     glRotatef(angle_x, 1.0f, 0.0f, 0.0f);
     glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
-    //camera();
+    camera();
     drawMap();
-    //drawPlayer();
+    drawPlayer();
     cube();
     renderScore();
     model.draw();
-    //building.draw();
-
-    player.draw();
 
     glutSwapBuffers();
 }
 void keyboard(unsigned char key, int x, int y)
 {
-    float moveSpeed = 0.5;
-    float xrotrad;
-    float yrotrad;
     if (key == 'w')
     {
-        yrotrad = (yrot / 180 * 3.141592654f);
-        xrotrad = (xrot / 180 * 3.141592654f);
-        updatePlayerPosition(float(sin(yrotrad)) * moveSpeed, 0.0, float(cos(yrotrad)) * moveSpeed);
-        //xpos += float(sin(yrotrad)) * moveSpeed;
-        //zpos += float(cos(yrotrad)) * moveSpeed;
-        //ypos -= float(sin(xrotrad)) * moveSpeed;
+        speed += acceleration;
+        if (speed > maxSpeed) speed = maxSpeed;
     }
     if (key == 's')
     {
-        yrotrad = (yrot / 180 * 3.141592654f);
-        xrotrad = (xrot / 180 * 3.141592654f);
-        updatePlayerPosition(-float(sin(yrotrad)) * moveSpeed, 0.0, -float(cos(yrotrad)) * moveSpeed);
-        //xpos -= float(sin(yrotrad)) * moveSpeed;
-        //zpos -= float(cos(yrotrad)) * moveSpeed;
-        //ypos += float(sin(xrotrad)) * moveSpeed;
+        speed -= deceleration;
+        if (speed < -maxSpeed / 2) speed = -maxSpeed / 2;
     }
     if (key == 'd')
     {
-        yrotrad = ((yrot + 90) / 180 * 3.141592654f);
-        xrotrad = (xrot / 180 * 3.141592654f);
-        updatePlayerPosition(-float(sin(yrotrad)) * moveSpeed, 0.0, -float(cos(yrotrad)) * moveSpeed);
-        //xpos -= float(sin(yrotrad)) * moveSpeed;
-        //zpos -= float(cos(yrotrad)) * moveSpeed;
+        rotate_y -= 3.0;
     }
     if (key == 'a')
     {
-        yrotrad = ((yrot - 90) / 180 * 3.141592654f);
-        updatePlayerPosition(-float(sin(yrotrad)) * moveSpeed, 0.0, -float(cos(yrotrad)) * moveSpeed);
-        //xpos -= float(sin(yrotrad)) * moveSpeed;
-        //zpos -= float(cos(yrotrad)) * moveSpeed;
+        rotate_y += 3.0;
     }
     if (key == 27)
     {
         exit(0);
-    }
-    if (key == 't') {
-        dlr = 1.0; // change light to white
-        dlg = 1.0;
-        dlb = 1.0;
-        cout << "Pressed 't': white light" << endl;
-        display();
-    }
-    if (key == 'r') {
-        dlr = 1.0; // change light to red
-        dlg = 0.0;
-        dlb = 0.0;
-        cout << "Pressed 'r': Red light" << endl;
-        display();
-    }
-    if (key == 'g') {
-        dlr = 0.0; // change light to green
-        dlg = 1.0;
-        dlb = 0.0;
-        cout << "Pressed 'g': Green light" << endl;
-        display();
-    }
-    if (key == 'b') {
-        dlr = 0.0; // change light to blue
-        dlg = 0.0;
-        dlb = 1.0;
-        cout << "Pressed 'b': Blue light" << endl;
-        display();
-    }
-    if (key == 'i') {
-        ly += 10.0; // move the light up
-        cout << "Pressed 'w': Move light up" << endl;
-        display();
-    }
-    if (key == 'k') {
-        ly -= 10.0; // move the light down
-        cout << "Pressed 's': Move light down" << endl;
-        display();
-    }
-    if (key == 'j') {
-        lx -= 10.0; // move the light left
-        cout << "Pressed 'a': Move light left" << endl;
-        display();
-    }
-    if (key == 'l') {
-        lx += 10.0; // move the light right
-        cout << "Pressed 'd': Move light right" << endl;
-        display();
     }
     glutPostRedisplay();
 }
@@ -571,16 +511,20 @@ int main(int argc, char **argv) {
     init();
     glutDisplayFunc(display);
     glutIdleFunc(display);
+    glutIdleFunc(updatePlayerPosition);
     glutReshapeFunc(reshape);
     texture = LoadTexture("grass.bmp", 256, 256);
     texture1 = LoadTexture("raod.bmp", 256, 256);
     texture2 = LoadTexture("white.bmp", 256, 256);
     PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-    glutMouseFunc(mouse);
-    glutMotionFunc(motion);
+    //glutMouseFunc(mouse);
+    //glutMotionFunc(motion);
     glutPassiveMotionFunc(mouseMovement);
     glutKeyboardFunc(keyboard);
     glutTimerFunc(0, timer, 0);
     glutMainLoop();
+    FreeTexture(texture);
+    FreeTexture(texture1);
+    FreeTexture(texture2);
     return 0;
 }
