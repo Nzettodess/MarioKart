@@ -10,6 +10,7 @@
 #include <vector>
 #include <windows.h>
 #include <MMSystem.h>
+#include <chrono>
 using namespace std;
 
 int POS_X, POS_Y;
@@ -42,6 +43,10 @@ GLfloat lw = 0.0;
 GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
 
+chrono::high_resolution_clock::time_point lastTime;
+float deltaTime = 0.0f, totalTime = 10.0f;
+bool game_over = false;
+
 const int MAP_SIZE = 30;
 int gameMap[MAP_SIZE][MAP_SIZE] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -49,17 +54,7 @@ int gameMap[MAP_SIZE][MAP_SIZE] = {
     {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 2, 0, 0, 1, 0, 2, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
@@ -69,7 +64,17 @@ int gameMap[MAP_SIZE][MAP_SIZE] = {
     {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 2, 0, 0, 1, 0, 2, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
@@ -77,7 +82,7 @@ int gameMap[MAP_SIZE][MAP_SIZE] = {
 };
 float xpos = 15.0 * 5.0, ypos = 0, zpos = 10.0, xrot = 0, yrot = 0, angle = 0.0;
 float lastx, lasty;
-float speed = 0.0, maxSpeed = 0.1, acceleration = 0.005, deceleration = 0.01;
+float speed = 0.0, maxSpeed = 0.5, acceleration = 0.005, deceleration = 0.01;
 float positionx[100], positiony[100], positionz[100], buildX[12], buildZ[12];
 int score = 0;
 double rotate_x = 0, rotate_y = 0;
@@ -309,14 +314,38 @@ void drawMap(void)
 }
 void renderScore(void)
 {
+    glMatrixMode(GL_PROJECTION);
     glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, WIDTH, HEIGHT, 0); // Set up orthographic projection
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
     glColor3f(10.0, 10.0, 10.0);
-    glRasterPos3f(xpos, 1.25, zpos); // Adjust position as needed
-    std::string scoreText = "Score: " + std::to_string(score);
+    glRasterPos2f(WIDTH/3, 20.0); // Adjust position as needed
+    string scoreText = "Score: " + std::to_string(score);
     for (char c : scoreText) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
     }
+    glRasterPos2f(WIDTH/2, 20.0);
+    string timeText = "Time: " + to_string(static_cast<int>(totalTime)) + "s";
+    for (char c : timeText) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
+    }
+    if (game_over) {
+        // Display "Game Over" message
+        glRasterPos2f(WIDTH/2.5, HEIGHT/2); // Adjust position as needed
+        string gameOverText = "Game Over! Final Score: " + std::to_string(score)
+                            + "\n\nPress ESC to Exit.";
+        for (char c : gameOverText) {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
+        }
+    }
     glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 void camera(void)
 {
@@ -387,7 +416,7 @@ void init() {
 
     //model.load("Models/MarioKart/mk_kart.obj");
     model.load("Models/Coins/Bells.obj");
-    //building.load("Models/Building/building.obj");
+    building.load("Models/Building/building.obj");
     //building.load("Models/FTMK Building/untitled.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
     //player.load("Models/Building/building.obj");
@@ -397,6 +426,8 @@ void init() {
     pos_z = model.pos_z - 1.0f;
 
     zoom_per_scroll = -model.pos_z / 10.0f;
+
+    lastTime = std::chrono::high_resolution_clock::now();
 }
 
 void display() {
@@ -410,37 +441,57 @@ void display() {
     drawPlayer();
     cube();
     renderScore();
-    model.draw();
+
+    angle++;
 
     glutSwapBuffers();
+    is_updated = true;
 }
 void keyboard(unsigned char key, int x, int y)
 {
-    if (key == 'w')
-    {
-        speed += acceleration;
-        if (speed > maxSpeed) speed = maxSpeed;
+    if (game_over) {
+        if (key == 27)
+        {
+            exit(0);
+        }
     }
-    if (key == 's')
-    {
-        speed -= deceleration;
-        if (speed < -maxSpeed / 2) speed = -maxSpeed / 2;
-    }
-    if (key == 'd')
-    {
-        rotate_y -= 3.0;
-    }
-    if (key == 'a')
-    {
-        rotate_y += 3.0;
-    }
-    if (key == 27)
-    {
-        exit(0);
+    else {
+        if (key == 'w')
+        {
+            speed += acceleration;
+            if (speed > maxSpeed) speed = maxSpeed;
+        }
+        if (key == 's')
+        {
+            speed -= deceleration;
+            if (speed < -maxSpeed / 2) speed = -maxSpeed / 2;
+        }
+        if (key == 'd')
+        {
+            rotate_y -= 3.0;
+        }
+        if (key == 'a')
+        {
+            rotate_y += 3.0;
+        }
+        if (key == 27)
+        {
+            exit(0);
+        }
     }
     glutPostRedisplay();
 }
 void timer(int value) {
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+    lastTime = currentTime;
+    totalTime -= deltaTime;
+
+    if (totalTime <= 0.0)
+    {
+        totalTime = 0.0;
+        game_over = true;
+    }
     if (is_updated) {
         is_updated = false;
         glutPostRedisplay();
