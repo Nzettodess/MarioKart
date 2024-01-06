@@ -14,8 +14,6 @@
 using namespace std;
 
 int POS_X, POS_Y;
-
-
 float pos_x, pos_y, pos_z;
 float angle_x = 30.0f, angle_y = 0.0f;
 
@@ -41,63 +39,66 @@ GLfloat lz = 1.0;
 GLfloat lw = 1.0;
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
-void drawBackground(void);
+
 chrono::high_resolution_clock::time_point lastTime;
 float deltaTime = 0.0f, totalTime = 10000.0f;
 bool game_over = false;
 
 const int MAP_SIZE = 40;
+const int CHARACTER = 3;
 int gameMap[MAP_SIZE][MAP_SIZE] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
     {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 0},
     {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},//Back
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},//Front
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
     {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
     {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
+int character = 0;
 float xpos = 15.0 * 5.0, ypos = -1.0, zpos = 10.0, xrot = 0, yrot = 0, angle = 0.0;
 float lastx, lasty;
 float speed = 0.0, maxSpeed = 1.0, acceleration = 0.05, deceleration = 0.1;
-float positionx[100], positiony[100], positionz[100], buildX[12], buildZ[12], treeX[100], treeZ[100];
+float positionx[100], positionz[100], clockX[10], clockZ[10], buildX[12], buildZ[12], treeX[100], treeZ[100];
 int score = 0;
 double rotate_x = 0, rotate_y = 0;
 GLuint texture, texture1, texture2, texture3; //the array for our texture
 
-Model model, building, player, tree, background;
+Model model, clocks, building, player, player1, player2, tree, background;
+Model mario, kart, mtire;
 GLuint LoadTexture(const char* filename, int width, int	height)
 {
     GLuint texture;
@@ -130,15 +131,23 @@ void cubepositions(void)
 {
     srand(time(NULL));
     int cubeCount = 0;
+    int clockCount = 0;
     while (cubeCount < 100)
     {
         int i = rand() % MAP_SIZE;
         int j = rand() % MAP_SIZE;
-        if (gameMap[i][j] == 1)
+        int p = rand() % 100;
+        if (gameMap[i][j] == 1 && p > 3)
         {
             positionz[cubeCount] = j * 5.0 + 0.5; // Adjust for cube size
             positionx[cubeCount] = i * 5.0 + 0.5; // Adjust for cube size
             cubeCount++;
+        }
+        else if (gameMap[i][j] == 1 && p <= 3 && clockCount < 10)
+        {
+            clockZ[clockCount] = j * 5.0 + 0.5;
+            clockX[clockCount] = i * 5.0 + 0.5;
+            clockCount++;
         }
     }
 }
@@ -146,6 +155,7 @@ void buildPosition(void)
 {
     float groundSize = 5.0;
     int p = 0;
+    int s = 0;
     for (int i = 0; i < MAP_SIZE; i++)
     {
         for (int j = 0; j < MAP_SIZE; j++)
@@ -160,8 +170,9 @@ void buildPosition(void)
             }
             if (gameMap[i][j] == 3)
             {
-                treeX[p] = xTranslation;
-                treeZ[p] = zTranslation;
+                treeX[s] = xTranslation;
+                treeZ[s] = zTranslation;
+                s++;
             }
         }
     }
@@ -245,7 +256,7 @@ void updatePlayerPosition(void)
 
     for (int i = 0; i < 12; i++)
     {
-        if (checkBuildingCollision(newX, newY, newZ, buildX[i]-10.0, 0.0, buildZ[i], 5.0*4, 0.0, 5.0*31))
+        if (checkBuildingCollision(newX, newY, newZ, buildX[i] - 10.0, 0.0, buildZ[i], 5.0 * 4, 0.0, 5.0 * 31))
         {
             // Collision detected with building i
             // Adjust player position to resolve collision
@@ -254,6 +265,9 @@ void updatePlayerPosition(void)
             newY = ypos;
             newZ = zpos;
         }
+    }
+    for (int i = 0; i < 100; i++)
+    {
         if (checkBuildingCollision(newX, newY, newZ, treeX[i], 0.0, treeZ[i], 5.0, 0.0, 5.0))
         {
             // Collision detected with building i
@@ -299,6 +313,32 @@ void cube(void)
         }
     }
 }
+void drawClock(void)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        if (!checkCollision(clockX[i], 0.0, clockZ[i], 1.0))
+        {
+            glPushMatrix();
+            glColor3f(1.0, 1.0, 1.0);
+            clocks.draw(clockX[i], 0.0, clockZ[i], 0.01, 0.0, angle + 90.0, 0.0);
+            glPopMatrix();
+        }
+        else
+        {
+            // Cube collided, update its position
+            totalTime += 20;
+            int k, l;
+            do {
+                k = rand() % MAP_SIZE;
+                l = rand() % MAP_SIZE;
+            } while (gameMap[k][l] != 1);
+
+            clockZ[i] = l * 5.0 + 0.5; // Adjust for cube size
+            clockX[i] = k * 5.0 + 0.5; // Adjust for cube size
+        }
+    }
+}
 void drawTree(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
 {
     glPushMatrix();
@@ -323,9 +363,29 @@ void drawPlayer(void)
     GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
     glColor3f(1.0f, 1.0f, 1.0f);
-    player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
-    //background.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
-    //player.draw();
+    if (character == 0)
+    {
+        player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    }
+    else if (character == 1)
+    {
+        player1.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    }
+    else if (character == 2)
+    {
+        player2.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    }
+    glPopMatrix();
+}
+void drawMario(void)
+{
+    glPushMatrix();
+    GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    mario.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    kart.draw(xpos, ypos - 0.05, zpos, 1.0, 0.0, rotate_y, 0.0);
+    mtire.draw(xpos - 0.05, 0.0, zpos - 0.05, 1.0, 0.0, 0.0, 0.0);
     glPopMatrix();
 }
 void drawMap(void)
@@ -333,7 +393,7 @@ void drawMap(void)
     float groundSize = 5.0;
     for (int i = 0; i < MAP_SIZE; i++)
     {
-       
+
         for (int j = 0; j < MAP_SIZE; j++)
         {
             float xTranslation = i * groundSize;
@@ -359,11 +419,11 @@ void drawMap(void)
             {
                 //drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
 
-                drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
+                drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
             }
             if (gameMap[i][j] == 3)
             {
-                drawTree(xTranslation, -1.0, zTranslation, 1.0, 0.0, 0.0, 0.0);
+                drawTree(xTranslation, -1.0, zTranslation, 0.6, 0.0, 0.0, 0.0);
                 //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
             }
         }
@@ -373,12 +433,11 @@ void drawBackground(void)
 {
     glPushMatrix();
     /*glTranslated(0.0, 0.0, 0.0);
-    glScaled(1000.0f, 1000.0f, 1000.0f); 
+    glScaled(1000.0f, 1000.0f, 1000.0f);
     glBindTexture(GL_TEXTURE_2D, texture3);
     wall();
     glBindTexture(GL_TEXTURE_2D, texture2);*/
-    glColor3f(0, 1, 1.0);
-
+    glColor3f(0.0, 0.0, 0.0);
 
     background.draw(50, 0, 50, 1000, 0.0, 0.0, 0.0);
     glPopMatrix();
@@ -442,7 +501,6 @@ void reshape(int w, int h)
     gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 200000.0);
     glMatrixMode(GL_MODELVIEW);
 }
-
 void mouseMovement(int x, int y)
 {
     int diffx = x - lastx;//check the difference between the current x and the last x position
@@ -456,8 +514,6 @@ void mouseMovement(int x, int y)
 void init() {
     cubepositions();
     buildPosition();
-
-
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -481,7 +537,6 @@ void init() {
     gluPerspective(20.0, 1.0, 1.0, 200000.0);
     glMatrixMode(GL_MODELVIEW);
 
-
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -496,16 +551,18 @@ void init() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
-
-    model.load("Models/Interative Object/Coins/Bells.obj");
-    //building.load("Models/Building/building.obj");
+    model.load("Models/Interactive Object/Coins/Bells.obj");
+    clocks.load("Models/Interactive Object/clock/clockpickup.obj");
     //building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
     building.load("Models/Building/FTMK Building/1.obj"); // need scale
     player.load("Models/Mario Kart/Mario Kart by Sets/MarioKart/mk_kart.obj");
-    tree.load("Models/Enviroments/Tree/Lowpoly_Tree.obj");
-    background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
-
+    player1.load("Models/Mario Kart/Mario Kart by Sets/Browser/kk_kart.obj");
+    player2.load("Models/Mario Kart/Mario Kart by Sets/Peach/pk_kart.obj");
+    tree.load("Models/Environments/Tree/Lowpoly_Tree.obj");
+    mario.load("Models/Mario Kart/Mario Kart by Parts/Drivers/Mario/untitled.obj");
+    kart.load("Models/Mario Kart/Mario Kart by Parts/Karts without tires/Standard MR/untitled.obj");
+    mtire.load("Models/Mario Kart/Mario Kart by Parts/Tires/Medium/kart_tire_M.obj");
+    //background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -523,7 +580,6 @@ void display() {
     glRotatef(angle_x, 1.0f, 0.0f, 0.0f);
     glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
 
-
     GLfloat DiffuseLight[] = { dlr, dlg, dlb };
     GLfloat AmbientLight[] = { alr, alg, alb };
     glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
@@ -533,16 +589,15 @@ void display() {
     GLfloat Lightbuilding[] = { lx, 291, 1.0, 1.0 };
     glLightfv(GL_LIGHT2, GL_POSITION, LightPosition);
 
-
     //GLfloat global_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
-    
-
 
     camera();
     drawMap();
     drawPlayer();
+    drawMario();
     cube();
+    drawClock();
     drawBackground();
     renderScore();
 
@@ -577,6 +632,11 @@ void keyboard(unsigned char key, int x, int y)
         if (key == 'a')
         {
             rotate_y += 3.0;
+        }
+        if (key == 'e')
+        {
+            character++;
+            character = character % CHARACTER;
         }
         if (key == 27)
         {
@@ -669,7 +729,6 @@ void timer(int value) {
     }
     glutTimerFunc(INTERVAL, timer, 0);
 }
-
 void mouse(int button, int state, int x, int y) {
     is_updated = true;
 
@@ -699,7 +758,6 @@ void mouse(int button, int state, int x, int y) {
         }
     }
 }
-
 void motion(int x, int y) {
     if (is_holding_mouse) {
         is_updated = true;
@@ -737,9 +795,9 @@ int main(int argc, char** argv) {
     glutIdleFunc(display);
     glutIdleFunc(updatePlayerPosition);
     glutReshapeFunc(reshape);
-    texture = LoadTexture("Models/Enviroments/Environment Textures/grass.bmp", 256, 256);
-    texture1 = LoadTexture("Models/Enviroments/Environment Textures/raod.bmp", 256, 256);
-    texture2 = LoadTexture("Models/Enviroments/Environment Textures/white.bmp", 256, 256);
+    texture = LoadTexture("Models/Environments/Environment Textures/grass.bmp", 256, 256);
+    texture1 = LoadTexture("Models/Environments/Environment Textures/raod.bmp", 256, 256);
+    texture2 = LoadTexture("Models/Environments/Environment Textures/white.bmp", 256, 256);
     //texture3 = LoadTexture("Models/Background/Texture Background Galaxy 158x108/Galaxy Back.bmp", 158, 108);
     //texture3 = LoadTexture("Models/Background/Texture Background Sky 1365x768/BG Back.bmp", 158, 108);
     PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
