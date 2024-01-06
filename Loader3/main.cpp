@@ -46,48 +46,58 @@ chrono::high_resolution_clock::time_point lastTime;
 float deltaTime = 0.0f, totalTime = 10000.0f;
 bool game_over = false;
 
-const int MAP_SIZE = 30;
+const int MAP_SIZE = 40;
 int gameMap[MAP_SIZE][MAP_SIZE] = {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
-float xpos = 15.0 * 5.0, ypos = 0, zpos = 10.0, xrot = 0, yrot = 0, angle = 0.0;
+float xpos = 15.0 * 5.0, ypos = -1.0, zpos = 10.0, xrot = 0, yrot = 0, angle = 0.0;
 float lastx, lasty;
-float speed = 0.0, maxSpeed = 0.5, acceleration = 0.005, deceleration = 0.01;
-float positionx[100], positiony[100], positionz[100], buildX[12], buildZ[12];
+float speed = 0.0, maxSpeed = 1.0, acceleration = 0.05, deceleration = 0.1;
+float positionx[100], positiony[100], positionz[100], buildX[12], buildZ[12], treeX[100], treeZ[100];
 int score = 0;
 double rotate_x = 0, rotate_y = 0;
-GLuint texture, texture1, texture2; //the array for our texture
+GLuint texture, texture1, texture2, texture3; //the array for our texture
 
-Model model, building, player;
+Model model, building, player, tree;
 GLuint LoadTexture(const char* filename, int width, int	height)
 {
     GLuint texture;
@@ -148,6 +158,11 @@ void buildPosition(void)
                 buildZ[p] = zTranslation;
                 p++;
             }
+            if (gameMap[i][j] == 3)
+            {
+                treeX[p] = xTranslation;
+                treeZ[p] = zTranslation;
+            }
         }
     }
 }
@@ -161,11 +176,21 @@ void ground(void)
     glTexCoord2d(0.0, 1.0); glVertex3f(-0.5, 0.0, 0.5);
     glEnd();
 }
+void wall(void)
+{
+    glBegin(GL_QUADS);
+    glColor3f(1.0, 1.0, 1.0);
+    glTexCoord2d(0.0, 0.0); glVertex3f(-0.5, 0.0, -0.5);
+    glTexCoord2d(1.0, 0.0); glVertex3f(0.5, 0.0, -0.5);
+    glTexCoord2d(1.0, 1.0); glVertex3f(0.5, 1.0, -0.5);
+    glTexCoord2d(0.0, 1.0); glVertex3f(-0.5, 1.0, -0.5);
+    glEnd();
+}
 bool checkCollision(float cubeX, float cubeY, float cubeZ, float cubeSize)
 {
     // Assuming player size is 1x1x1
     if (xpos + 0.5 > cubeX - cubeSize / 2 && xpos - 0.5 < cubeX + cubeSize / 2 &&
-        ypos + 0.5 > cubeY - cubeSize / 2 && ypos - 0.5 < cubeY + cubeSize / 2 &&
+        ypos + 1.0 > cubeY - cubeSize / 2 && ypos - 0.5 < cubeY + cubeSize / 2 &&
         zpos + 0.5 > cubeZ - cubeSize / 2 && zpos - 0.5 < cubeZ + cubeSize / 2)
     {
         return true; // Collision detected
@@ -179,8 +204,8 @@ bool checkBuildingCollision(float playerX, float playerY, float playerZ,
     // Assuming buildings are axis-aligned boxes
     if (playerX + 0.5 > buildingX - buildingSizeX / 2 &&
         playerX - 0.5 < buildingX + buildingSizeX / 2 &&
-        playerY + 0.5 > buildingY - buildingSizeY / 2 &&
-        playerY - 0.5 < buildingY + buildingSizeY / 2 &&
+        playerY + 1.5 > buildingY - buildingSizeY / 2 &&
+        playerY - 1.5 < buildingY + buildingSizeY / 2 &&
         playerZ + 0.5 > buildingZ - buildingSizeZ / 2 &&
         playerZ - 0.5 < buildingZ + buildingSizeZ / 2)
     {
@@ -220,7 +245,16 @@ void updatePlayerPosition(void)
 
     for (int i = 0; i < 12; i++)
     {
-        if (checkBuildingCollision(newX, newY, newZ, buildX[i], 0.0, buildZ[i], 25.0, 0.0, 15.0))
+        if (checkBuildingCollision(newX, newY, newZ, buildX[i]-10.0, 0.0, buildZ[i], 5.0*4, 0.0, 5.0*31))
+        {
+            // Collision detected with building i
+            // Adjust player position to resolve collision
+            // For simplicity, you can stop player movement in the colliding direction
+            newX = xpos;
+            newY = ypos;
+            newZ = zpos;
+        }
+        if (checkBuildingCollision(newX, newY, newZ, treeX[i], 0.0, treeZ[i], 5.0, 0.0, 5.0))
         {
             // Collision detected with building i
             // Adjust player position to resolve collision
@@ -265,6 +299,15 @@ void cube(void)
         }
     }
 }
+void drawTree(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
+{
+    glPushMatrix();
+    glColor3f(0.2f, 0.2f, 0.2f);
+    GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
+    tree.draw(x, y, z, scale, angleX, angleY, angleZ);
+    glPopMatrix();
+}
 void drawBuilding(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
 {
     glPushMatrix();
@@ -296,7 +339,7 @@ void drawMap(void)
             glPushMatrix();
             glTranslated(xTranslation, -1.0, zTranslation);
             glScaled(groundSize, 1.0f, groundSize);
-            if (gameMap[i][j] == 0 || gameMap[i][j] == 0)
+            if (gameMap[i][j] == 0 || gameMap[i][j] == 3)
             {
                 glBindTexture(GL_TEXTURE_2D, texture);
             }
@@ -310,11 +353,26 @@ void drawMap(void)
             glPopMatrix();
             if (gameMap[i][j] == 2)
             {
-                drawBuilding(xTranslation, -1.0, zTranslation, 0.02, 0.0, 90.0, 0.0);
+                drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
+                //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
+            }
+            if (gameMap[i][j] == 3)
+            {
+                drawTree(xTranslation, -1.0, zTranslation, 1.0, 0.0, 0.0, 0.0);
                 //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
             }
         }
     }
+}
+void drawBackground(void)
+{
+    glPushMatrix();
+    glTranslated(0.0, 0.0, 0.0);
+    glScaled(100.0f, 100.0f, 100.0f);
+    glBindTexture(GL_TEXTURE_2D, texture3);
+    wall();
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glPopMatrix();
 }
 void renderScore(void)
 {
@@ -327,21 +385,21 @@ void renderScore(void)
     glLoadIdentity();
 
     glColor3f(10.0, 10.0, 10.0);
-    glRasterPos2f(WIDTH/3, 20.0); // Adjust position as needed
+    glRasterPos2f(WIDTH / 3, 20.0); // Adjust position as needed
     string scoreText = "Score: " + std::to_string(score);
     for (char c : scoreText) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
     }
-    glRasterPos2f(WIDTH/2, 20.0);
+    glRasterPos2f(WIDTH / 2, 20.0);
     string timeText = "Time: " + to_string(static_cast<int>(totalTime)) + "s";
     for (char c : timeText) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
     }
     if (game_over) {
         // Display "Game Over" message
-        glRasterPos2f(WIDTH/2.5, HEIGHT/2); // Adjust position as needed
+        glRasterPos2f(WIDTH / 2.5, HEIGHT / 2); // Adjust position as needed
         string gameOverText = "Game Over! Final Score: " + std::to_string(score)
-                            + "\n\nPress ESC to Exit.";
+            + "\n\nPress ESC to Exit.";
         for (char c : gameOverText) {
             glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
         }
@@ -358,7 +416,7 @@ void camera(void)
     //glTranslated(-xpos, -ypos, -zpos);
     // Calculate the position of the camera in a third-person view
     float cameraDistance = 3.0; // adjust this distance as needed
-    float cameraHeight = 0.0;   // adjust this height as needed
+    float cameraHeight = -0.5;  // adjust this height as needed
 
     float xCam = xpos - cameraDistance * sin(yrot * (3.14159265 / 180.0));
     float zCam = zpos - cameraDistance * cos(yrot * (3.14159265 / 180.0));
@@ -390,7 +448,7 @@ void init() {
     cubepositions();
     buildPosition();
 
-    
+
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -430,13 +488,13 @@ void init() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
-    
+
     model.load("Models/Coins/Bells.obj");
     //building.load("Models/Building/building.obj");
-    building.load("Models/FTMK Building/FTMK.obj"); // need scale
+    //building.load("Models/FTMK Building/FTMK.obj"); // need scale
     //building.load("Models/FTMK Building/1.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
-  
+    tree.load("Models/Tree/Lowpoly_Tree.obj");
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -475,6 +533,7 @@ void display() {
     drawMap();
     drawPlayer();
     cube();
+    drawBackground();
     renderScore();
 
     angle++;
@@ -606,9 +665,11 @@ void mouse(int button, int state, int x, int y) {
             x_old = x;
             y_old = y;
             is_holding_mouse = true;
-        } else
+        }
+        else
             is_holding_mouse = false;
-    } else if (state == GLUT_UP) {
+    }
+    else if (state == GLUT_UP) {
         switch (button) {
         case 3:
             if (current_scroll > 0) {
@@ -646,7 +707,7 @@ void motion(int x, int y) {
     }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
@@ -666,6 +727,7 @@ int main(int argc, char **argv) {
     texture = LoadTexture("grass.bmp", 256, 256);
     texture1 = LoadTexture("raod.bmp", 256, 256);
     texture2 = LoadTexture("white.bmp", 256, 256);
+    texture3 = LoadTexture("Models/Galaxy/Galaxy-Back.bmp", 158, 108);
     PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
@@ -676,5 +738,6 @@ int main(int argc, char **argv) {
     FreeTexture(texture);
     FreeTexture(texture1);
     FreeTexture(texture2);
+    FreeTexture(texture3);
     return 0;
 }
