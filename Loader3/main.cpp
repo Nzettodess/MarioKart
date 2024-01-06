@@ -44,7 +44,7 @@ GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
 
 chrono::high_resolution_clock::time_point lastTime;
-float deltaTime = 0.0f, totalTime = 10.0f;
+float deltaTime = 0.0f, totalTime = 10000.0f;
 bool game_over = false;
 
 const int MAP_SIZE = 30;
@@ -307,7 +307,7 @@ void drawMap(void)
             glPopMatrix();
             if (gameMap[i][j] == 2)
             {
-                drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
+                drawBuilding(xTranslation, -1.0, zTranslation, 0.015, 0.0, 90.0, 0.0);
             }
         }
     }
@@ -395,15 +395,23 @@ void init() {
     glEnable(GL_LIGHT5); //enable LIGHT1, our Ambient Light
     glEnable(GL_LIGHT6); //enable LIGHT1, our Ambient Light
     glEnable(GL_LIGHT7); //enable LIGHT1, our Ambient Light
+
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+
+    GLfloat DiffuseLight[] = { dlr, dlg, dlb };
+    GLfloat AmbientLight[] = { alr, alg, alb };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbientLight);
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(20.0, 1.0, 1.0, 2000.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_LINE_SMOOTH);
@@ -414,12 +422,12 @@ void init() {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
 
-    //model.load("Models/MarioKart/mk_kart.obj");
+    
     model.load("Models/Coins/Bells.obj");
-    building.load("Models/Building/building.obj");
-    //building.load("Models/FTMK Building/untitled.obj"); // need scale
+    //building.load("Models/Building/building.obj");
+    building.load("Models/FTMK Building/FTMK.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
-    //player.load("Models/Building/building.obj");
+  
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -558,7 +566,7 @@ int main(int argc, char **argv) {
     //POS_Y = (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) >> 1;
     //glutInitWindowPosition(POS_X, POS_Y);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("Load Model");
+    glutCreateWindow("Street Kart Around FTMK by Resident Evil");
     init();
     glutDisplayFunc(display);
     glutIdleFunc(display);
