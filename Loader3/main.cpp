@@ -39,9 +39,9 @@ GLfloat lx = 1.0;
 GLfloat ly = 1.0;
 GLfloat lz = 1.0;
 GLfloat lw = 1.0;
-GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 1.0 }; /* Red diffuse light. */
+GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
-
+void drawBackground(void);
 chrono::high_resolution_clock::time_point lastTime;
 float deltaTime = 0.0f, totalTime = 10000.0f;
 bool game_over = false;
@@ -324,7 +324,7 @@ void drawPlayer(void)
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
     glColor3f(1.0f, 1.0f, 1.0f);
     player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
-    background.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    //background.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
     //player.draw();
     glPopMatrix();
 }
@@ -333,6 +333,7 @@ void drawMap(void)
     float groundSize = 5.0;
     for (int i = 0; i < MAP_SIZE; i++)
     {
+       
         for (int j = 0; j < MAP_SIZE; j++)
         {
             float xTranslation = i * groundSize;
@@ -356,9 +357,9 @@ void drawMap(void)
             glPopMatrix();
             if (gameMap[i][j] == 2)
             {
-                drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
+                //drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
 
-                //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
+                drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
             }
             if (gameMap[i][j] == 3)
             {
@@ -376,8 +377,10 @@ void drawBackground(void)
     glBindTexture(GL_TEXTURE_2D, texture3);
     wall();
     glBindTexture(GL_TEXTURE_2D, texture2);*/
-    glColor3f(1.0f, 1.0f, 1.0f);
-    //background.draw(xTranslation, -1.0, zTranslation, 1.0, 0.0, 0.0, 0.0);
+    glColor3f(0, 1, 1.0);
+
+
+    background.draw(50, 0, 50, 1000, 0.0, 0.0, 0.0);
     glPopMatrix();
 }
 void renderScore(void)
@@ -497,8 +500,8 @@ void init() {
 
     model.load("Models/Interative Object/Coins/Bells.obj");
     //building.load("Models/Building/building.obj");
-    building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
-    //building.load("Models/FTMK Building/1.obj"); // need scale
+    //building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
+    building.load("Models/Building/FTMK Building/1.obj"); // need scale
     player.load("Models/Mario Kart/Mario Kart by Sets/MarioKart/mk_kart.obj");
     tree.load("Models/Enviroments/Tree/Lowpoly_Tree.obj");
     background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
