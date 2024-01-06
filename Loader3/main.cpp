@@ -14,7 +14,7 @@
 using namespace std;
 
 int POS_X, POS_Y;
-GLfloat light_pos[] = {-10.0f, 10.0f, 100.00f, 1.0f};
+
 
 float pos_x, pos_y, pos_z;
 float angle_x = 30.0f, angle_y = 0.0f;
@@ -35,11 +35,10 @@ GLfloat alr = 1.0;
 GLfloat alg = 1.0;
 GLfloat alb = 1.0;
 //light position variables
-GLfloat lx = 0.0;
-GLfloat ly = 0.0;
+GLfloat lx = 1.0;
+GLfloat ly = 1.0;
 GLfloat lz = 1.0;
-GLfloat lw = 0.0;
-
+GLfloat lw = 1.0;
 GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
 
@@ -269,14 +268,18 @@ void cube(void)
 void drawBuilding(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
 {
     glPushMatrix();
-    glColor3f(0.5f, 0.5f, 0.5f);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
     building.draw(x, y, z, scale, angleX, angleY, angleZ);
     glPopMatrix();
 }
 void drawPlayer(void)
 {
     glPushMatrix();
-    glColor3f(0.2f, 0.2f, 0.2f);
+    GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
+    glColor3f(1.0f, 1.0f, 1.0f);
     player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
     //player.draw();
     glPopMatrix();
@@ -307,7 +310,8 @@ void drawMap(void)
             glPopMatrix();
             if (gameMap[i][j] == 2)
             {
-                drawBuilding(xTranslation, -1.0, zTranslation, 0.015, 0.0, 90.0, 0.0);
+                drawBuilding(xTranslation, -1.0, zTranslation, 0.02, 0.0, 90.0, 0.0);
+                //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
             }
         }
     }
@@ -386,6 +390,11 @@ void init() {
     cubepositions();
     buildPosition();
 
+    
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
+    //glShadeModel(GL_FLAT);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1); //enable LIGHT1, our Ambient Light
@@ -398,34 +407,34 @@ void init() {
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    GLfloat DiffuseLight[] = { dlr, dlg, dlb };
-    GLfloat AmbientLight[] = { alr, alg, alb };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbientLight);
-    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(20.0, 1.0, 1.0, 2000.0);
     glMatrixMode(GL_MODELVIEW);
+
+
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_LINE_SMOOTH);
+
+    //GLfloat material_diffuse[] = { .2, .2, .2, 1.0 };
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material_diffuse);
+
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
+
 
     
     model.load("Models/Coins/Bells.obj");
     //building.load("Models/Building/building.obj");
     building.load("Models/FTMK Building/FTMK.obj"); // need scale
+    //building.load("Models/FTMK Building/1.obj"); // need scale
     player.load("Models/MarioKart/mk_kart.obj");
   
 
@@ -444,6 +453,24 @@ void display() {
     glTranslatef(pos_x, pos_y, pos_z);
     glRotatef(angle_x, 1.0f, 0.0f, 0.0f);
     glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
+
+
+    GLfloat DiffuseLight[] = { dlr, dlg, dlb };
+    GLfloat AmbientLight[] = { alr, alg, alb };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbientLight);
+    GLfloat LightPosition[] = { lx, ly, lz, lw };
+    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+    GLfloat Lightbuilding[] = { lx, 291, 1.0, 1.0 };
+    glLightfv(GL_LIGHT2, GL_POSITION, LightPosition);
+
+
+    //GLfloat global_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+    GLfloat ground_ambient_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; // Higher ambient and diffuse values for the ground
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ground_ambient_diffuse);
+
+
     camera();
     drawMap();
     drawPlayer();
@@ -485,6 +512,70 @@ void keyboard(unsigned char key, int x, int y)
         if (key == 27)
         {
             exit(0);
+        }
+        if (key == 't') {
+            dlr = 1.0; // change light to white
+            dlg = 1.0;
+            dlb = 1.0;
+            cout << "Pressed 't': white light" << endl;
+            display();
+        }
+        if (key == 'r') {
+            dlr = 1.0; // change light to red
+            dlg = 0.0;
+            dlb = 0.0;
+            cout << "Pressed 'r': Red light" << endl;
+            display();
+        }
+        if (key == 'g') {
+            dlr = 0.0; // change light to green
+            dlg = 1.0;
+            dlb = 0.0;
+            cout << "Pressed 'g': Green light" << endl;
+            display();
+        }
+        if (key == 'b') {
+            dlr = 0.0; // change light to blue
+            dlg = 0.0;
+            dlb = 1.0;
+            cout << "Pressed 'b': Blue light" << endl;
+            display();
+        }
+        if (key == 'i') {
+            ly += 10.0; // move the light up
+            cout << "Pressed 'w': Move light up" << endl;
+            cout << "ly: " << ly << "lx: " << lx << endl;
+            display();
+        }
+        if (key == 'k') {
+            ly -= 10.0; // move the light down
+            cout << "Pressed 's': Move light down" << endl;
+            cout << "ly: " << ly << "lx: " << lx << endl;
+            display();
+        }
+        if (key == 'j') {
+            lx -= 10.0; // move the light left
+            cout << "Pressed 'a': Move light left" << endl;
+            cout << "ly: " << ly << "lx: " << lx << endl;
+            display();
+        }
+        if (key == 'l') {
+            lx += 10.0; // move the light right
+            cout << "Pressed 'd': Move light right" << endl;
+            cout << "ly: " << ly << "lx: " << lx << endl;
+            display();
+        }
+        if (key == 'm') {
+            alr += 0.1;
+            alg += 0.1;
+            alb += 0.1;
+            display();
+        }
+        if (key == 'n') {
+            alr -= 0.1;
+            alg -= 0.1;
+            alb -= 0.1;
+            display();
         }
     }
     glutPostRedisplay();
@@ -576,8 +667,8 @@ int main(int argc, char **argv) {
     texture1 = LoadTexture("raod.bmp", 256, 256);
     texture2 = LoadTexture("white.bmp", 256, 256);
     PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-    //glutMouseFunc(mouse);
-    //glutMotionFunc(motion);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
     glutPassiveMotionFunc(mouseMovement);
     glutKeyboardFunc(keyboard);
     glutTimerFunc(0, timer, 0);
