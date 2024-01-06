@@ -1,0 +1,8 @@
+newmtl dosune_ob
+Ka 0.4078431 0.1568628 0
+Kd 0.972549 0.6588235 0.6588235
+d 1
+Tr 1
+map_Ka dosune_ob.png
+map_Kd dosune_ob.png
+map_d dosune_ob.png
