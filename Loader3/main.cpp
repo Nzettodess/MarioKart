@@ -97,7 +97,7 @@ int score = 0;
 double rotate_x = 0, rotate_y = 0;
 GLuint texture, texture1, texture2, texture3; //the array for our texture
 
-Model model, building, player, tree;
+Model model, building, player, tree, background;
 GLuint LoadTexture(const char* filename, int width, int	height)
 {
     GLuint texture;
@@ -280,7 +280,7 @@ void cube(void)
         {
             glPushMatrix();
             //glTranslated(positionx[i], 0.0, positionz[i]);
-            glColor3f(1.0, 1.0, 0.0);
+            glColor3f(1.0, 1.0, 1.0);
             model.draw(positionx[i], 0.0, positionz[i], 1.0, angle + 90.0, 90.0, 90.0);
             glPopMatrix();
         }
@@ -302,9 +302,9 @@ void cube(void)
 void drawTree(float x, float y, float z, float scale, float angleX, float angleY, float angleZ)
 {
     glPushMatrix();
-    glColor3f(0.2f, 0.2f, 0.2f);
-    GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
+    glColor3f(0.1f, 0.1f, 0.1f);
+    //GLfloat model_ambient_diffuse[] = { 0.2, 0.2, 0.2, 1.0 }; // Lower ambient and diffuse values for the model
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
     tree.draw(x, y, z, scale, angleX, angleY, angleZ);
     glPopMatrix();
 }
@@ -324,6 +324,7 @@ void drawPlayer(void)
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, model_ambient_diffuse);
     glColor3f(1.0f, 1.0f, 1.0f);
     player.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
+    background.draw(xpos, ypos, zpos, 1.0, 0.0, rotate_y, 0.0);
     //player.draw();
     glPopMatrix();
 }
@@ -349,11 +350,14 @@ void drawMap(void)
             }
 
             ground();  // Draw the terrain
+            GLfloat ground_ambient_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; // Higher ambient and diffuse values for the ground
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ground_ambient_diffuse);
             glBindTexture(GL_TEXTURE_2D, texture2);
             glPopMatrix();
             if (gameMap[i][j] == 2)
             {
                 drawBuilding(xTranslation, -1.0, zTranslation, 0.05, 0.0, 90.0, 0.0);
+
                 //drawBuilding(xTranslation, -1.0, zTranslation, 1, 0.0, 90.0, 0.0);
             }
             if (gameMap[i][j] == 3)
@@ -367,11 +371,13 @@ void drawMap(void)
 void drawBackground(void)
 {
     glPushMatrix();
-    glTranslated(0.0, 0.0, 0.0);
-    glScaled(100.0f, 100.0f, 100.0f);
+    /*glTranslated(0.0, 0.0, 0.0);
+    glScaled(1000.0f, 1000.0f, 1000.0f); 
     glBindTexture(GL_TEXTURE_2D, texture3);
     wall();
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);*/
+    glColor3f(1.0f, 1.0f, 1.0f);
+    //background.draw(xTranslation, -1.0, zTranslation, 1.0, 0.0, 0.0, 0.0);
     glPopMatrix();
 }
 void renderScore(void)
@@ -430,7 +436,7 @@ void reshape(int w, int h)
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
+    gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 200000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -469,7 +475,7 @@ void init() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(20.0, 1.0, 1.0, 2000.0);
+    gluPerspective(20.0, 1.0, 1.0, 200000.0);
     glMatrixMode(GL_MODELVIEW);
 
 
@@ -489,12 +495,14 @@ void init() {
 
 
 
-    model.load("Models/Coins/Bells.obj");
+    model.load("Models/Interative Object/Coins/Bells.obj");
     //building.load("Models/Building/building.obj");
-    //building.load("Models/FTMK Building/FTMK.obj"); // need scale
+    building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
     //building.load("Models/FTMK Building/1.obj"); // need scale
-    player.load("Models/MarioKart/mk_kart.obj");
-    tree.load("Models/Tree/Lowpoly_Tree.obj");
+    player.load("Models/Mario Kart/Mario Kart by Sets/MarioKart/mk_kart.obj");
+    tree.load("Models/Enviroments/Tree/Lowpoly_Tree.obj");
+    background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
+
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -525,8 +533,7 @@ void display() {
 
     //GLfloat global_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
-    GLfloat ground_ambient_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; // Higher ambient and diffuse values for the ground
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ground_ambient_diffuse);
+    
 
 
     camera();
@@ -603,37 +610,40 @@ void keyboard(unsigned char key, int x, int y)
         if (key == 'i') {
             ly += 10.0; // move the light up
             cout << "Pressed 'w': Move light up" << endl;
-            cout << "ly: " << ly << "lx: " << lx << endl;
+            cout << "ly: " << ly << " lx: " << lx << endl;
             display();
         }
         if (key == 'k') {
             ly -= 10.0; // move the light down
             cout << "Pressed 's': Move light down" << endl;
-            cout << "ly: " << ly << "lx: " << lx << endl;
+            cout << "ly: " << ly << " lx: " << lx << endl;
             display();
         }
         if (key == 'j') {
             lx -= 10.0; // move the light left
             cout << "Pressed 'a': Move light left" << endl;
-            cout << "ly: " << ly << "lx: " << lx << endl;
+            cout << "ly: " << ly << " lx: " << lx << endl;
             display();
         }
         if (key == 'l') {
             lx += 10.0; // move the light right
             cout << "Pressed 'd': Move light right" << endl;
-            cout << "ly: " << ly << "lx: " << lx << endl;
+            cout << "ly: " << ly << " lx: " << lx << endl;
             display();
         }
         if (key == 'm') {
             alr += 0.1;
             alg += 0.1;
             alb += 0.1;
+
+            cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
             display();
         }
         if (key == 'n') {
             alr -= 0.1;
             alg -= 0.1;
             alb -= 0.1;
+            cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
             display();
         }
     }
@@ -724,10 +734,11 @@ int main(int argc, char** argv) {
     glutIdleFunc(display);
     glutIdleFunc(updatePlayerPosition);
     glutReshapeFunc(reshape);
-    texture = LoadTexture("grass.bmp", 256, 256);
-    texture1 = LoadTexture("raod.bmp", 256, 256);
-    texture2 = LoadTexture("white.bmp", 256, 256);
-    texture3 = LoadTexture("Models/Galaxy/Galaxy-Back.bmp", 158, 108);
+    texture = LoadTexture("Models/Enviroments/Environment Textures/grass.bmp", 256, 256);
+    texture1 = LoadTexture("Models/Enviroments/Environment Textures/raod.bmp", 256, 256);
+    texture2 = LoadTexture("Models/Enviroments/Environment Textures/white.bmp", 256, 256);
+    //texture3 = LoadTexture("Models/Background/Texture Background Galaxy 158x108/Galaxy Back.bmp", 158, 108);
+    //texture3 = LoadTexture("Models/Background/Texture Background Sky 1365x768/BG Back.bmp", 158, 108);
     PlaySound(TEXT("Music/music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
