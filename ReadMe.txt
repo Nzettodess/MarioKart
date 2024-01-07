@@ -1,1 +1,5 @@
-In order to use this application, you have to include path of the Loader3/include in your Visual Studio include, as well as the lib.
+In order to run this game, you have to include the path of the 'include' and the 'lib' in your Visual Studio.
+
+The solution configuration is Debug x86.
+
+Please place the lib/freeglut.dll into your windows/Syswow64 and windows/system32.

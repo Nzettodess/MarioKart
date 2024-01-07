@@ -40,8 +40,15 @@ GLfloat lw = 1.0;
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
 
+float cloudPositionsX[50];
+float cloudPositionsY[50];
+float cloudPositionsZ[50];
+float scaleCloud[50];
+float angleCloudX[50];
+float angleCloudY[50];
+
 chrono::high_resolution_clock::time_point lastTime;
-float deltaTime = 0.0f, totalTime = 10000.0f;
+float deltaTime = 0.0f, totalTime = 180.0f;
 bool game_over = false;
 
 const int MAP_SIZE = 40;
@@ -98,7 +105,7 @@ int score = 0;
 double rotate_x = 0, rotate_y = 0;
 GLuint texture, texture1, texture2, texture3; //the array for our texture
 
-Model model, clocks, building, player, player1, player2, tree, bush, grass, background;
+Model model, clocks, building, player, player1, player2, tree, bush, grass, background, cloud;
 Model mario, kart, mtire;
 GLuint LoadTexture(const char* filename, int width, int	height)
 {
@@ -463,6 +470,62 @@ void drawMap(void)
         }
     }
 }
+void drawCloud() {
+
+    for (int i = 0; i < 25; ++i) {
+        glPushMatrix();
+        glColor3f(1.0, 1.0, 1.0);
+        cloud.draw(cloudPositionsX[i], cloudPositionsY[i], cloudPositionsZ[i], scaleCloud[i], angleCloudX[i], angleCloudY[i], 0.0);
+        glPopMatrix();
+    }
+
+}
+void cloudPosition(void) {
+    // Seed for the random number generator
+    srand(time(NULL));
+    int cloudCount = 0;
+    //int clockCount = 0;
+    while (cloudCount < 25)
+    {
+        int i = rand() % MAP_SIZE;
+        int j = rand() % MAP_SIZE;
+        int p = rand() % 100;
+        int posy = rand() % 20 + 20;
+        int anglex = rand() % 180;
+        int angley = rand() % 180;
+        if (gameMap[i][j] == 1 && p > 3)
+        {
+            cloudPositionsZ[cloudCount] = j * 5.0 + 0.5; // Adjust for cube size
+            cloudPositionsX[cloudCount] = i * 5.0 + 0.5; // Adjust for cube size
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 2; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+
+            cloudCount++;
+        }
+        else if (gameMap[i][j] == 2 && p <= 30)
+        {
+            cloudPositionsZ[cloudCount] = j * 2.0 + 0.5;
+            cloudPositionsX[cloudCount] = i * 2.0 + 0.5;
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 1; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+            cloudCount++;
+        }
+        else if (gameMap[i][j] == 3 && p <= 3)
+        {
+            cloudPositionsZ[cloudCount] = j * 1.0 + 0.5;
+            cloudPositionsX[cloudCount] = i * 1.0 + 0.5;
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 2.5; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+            cloudCount++;
+        }
+    }
+}
 void drawBackground(void)
 {
     glPushMatrix();
@@ -471,9 +534,9 @@ void drawBackground(void)
     glBindTexture(GL_TEXTURE_2D, texture3);
     wall();
     glBindTexture(GL_TEXTURE_2D, texture2);*/
-    glColor3f(0.0, 0.0, 0.0);
+    glColor3f(0.0, 0.7, 1.000);
 
-    background.draw(50, 0, 50, 1000, 0.0, 0.0, 0.0);
+    background.draw(150, -50, 150, 190, 0.0, 0.0, 0.0);
     glPopMatrix();
 }
 void renderScore(void)
@@ -548,6 +611,11 @@ void mouseMovement(int x, int y)
 void init() {
     cubepositions();
     buildPosition();
+    cloudPosition();
+    
+        
+    
+    
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -564,7 +632,7 @@ void init() {
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+    glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -589,16 +657,25 @@ void init() {
     clocks.load("Models/Interactive Object/clock/clockpickup.obj");
     building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
     //building.load("Models/Building/FTMK Building/1.obj"); // need scale
+
+    cloud.load("Models/Environments/Cloud/cloud.obj");
+
     player.load("Models/Mario Kart/Mario Kart by Sets/MarioKart/mk_kart.obj");
     player1.load("Models/Mario Kart/Mario Kart by Sets/Browser/kk_kart.obj");
     player2.load("Models/Mario Kart/Mario Kart by Sets/Peach/pk_kart.obj");
+
     tree.load("Models/Environments/Tree/Lowpoly_Tree.obj");
     bush.load("Models/Environments/Bush/bush.obj");
     grass.load("Models/Environments/Grass/Grass Low/untitled.obj");
+
+    
+
     mario.load("Models/Mario Kart/Mario Kart by Parts/Drivers/Mario/untitled.obj");
     kart.load("Models/Mario Kart/Mario Kart by Parts/Karts without tires/Standard MR/untitled.obj");
     mtire.load("Models/Mario Kart/Mario Kart by Parts/Tires/Medium/kart_tire_M.obj");
+
     //background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
+    
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -627,11 +704,13 @@ void display() {
 
     //GLfloat global_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
-
+    
     camera();
     drawMap();
+    drawCloud();
     drawPlayer();
     //drawMario();
+    
     cube();
     drawClock();
     drawBackground();
@@ -678,73 +757,73 @@ void keyboard(unsigned char key, int x, int y)
         {
             exit(0);
         }
-        if (key == 't') {
-            dlr = 1.0; // change light to white
-            dlg = 1.0;
-            dlb = 1.0;
-            cout << "Pressed 't': white light" << endl;
-            display();
-        }
-        if (key == 'r') {
-            dlr = 1.0; // change light to red
-            dlg = 0.0;
-            dlb = 0.0;
-            cout << "Pressed 'r': Red light" << endl;
-            display();
-        }
-        if (key == 'g') {
-            dlr = 0.0; // change light to green
-            dlg = 1.0;
-            dlb = 0.0;
-            cout << "Pressed 'g': Green light" << endl;
-            display();
-        }
-        if (key == 'b') {
-            dlr = 0.0; // change light to blue
-            dlg = 0.0;
-            dlb = 1.0;
-            cout << "Pressed 'b': Blue light" << endl;
-            display();
-        }
-        if (key == 'i') {
-            ly += 10.0; // move the light up
-            cout << "Pressed 'w': Move light up" << endl;
-            cout << "ly: " << ly << " lx: " << lx << endl;
-            display();
-        }
-        if (key == 'k') {
-            ly -= 10.0; // move the light down
-            cout << "Pressed 's': Move light down" << endl;
-            cout << "ly: " << ly << " lx: " << lx << endl;
-            display();
-        }
-        if (key == 'j') {
-            lx -= 10.0; // move the light left
-            cout << "Pressed 'a': Move light left" << endl;
-            cout << "ly: " << ly << " lx: " << lx << endl;
-            display();
-        }
-        if (key == 'l') {
-            lx += 10.0; // move the light right
-            cout << "Pressed 'd': Move light right" << endl;
-            cout << "ly: " << ly << " lx: " << lx << endl;
-            display();
-        }
-        if (key == 'm') {
-            alr += 0.1;
-            alg += 0.1;
-            alb += 0.1;
+        //if (key == 't') {
+        //    dlr = 1.0; // change light to white
+        //    dlg = 1.0;
+        //    dlb = 1.0;
+        //    cout << "Pressed 't': white light" << endl;
+        //    display();
+        //}
+        //if (key == 'r') {
+        //    dlr = 1.0; // change light to red
+        //    dlg = 0.0;
+        //    dlb = 0.0;
+        //    cout << "Pressed 'r': Red light" << endl;
+        //    display();
+        //}
+        //if (key == 'g') {
+        //    dlr = 0.0; // change light to green
+        //    dlg = 1.0;
+        //    dlb = 0.0;
+        //    cout << "Pressed 'g': Green light" << endl;
+        //    display();
+        //}
+        //if (key == 'b') {
+        //    dlr = 0.0; // change light to blue
+        //    dlg = 0.0;
+        //    dlb = 1.0;
+        //    cout << "Pressed 'b': Blue light" << endl;
+        //    display();
+        //}
+        //if (key == 'i') {
+        //    ly += 10.0; // move the light up
+        //    cout << "Pressed 'w': Move light up" << endl;
+        //    cout << "ly: " << ly << " lx: " << lx << endl;
+        //    display();
+        //}
+        //if (key == 'k') {
+        //    ly -= 10.0; // move the light down
+        //    cout << "Pressed 's': Move light down" << endl;
+        //    cout << "ly: " << ly << " lx: " << lx << endl;
+        //    display();
+        //}
+        //if (key == 'j') {
+        //    lx -= 10.0; // move the light left
+        //    cout << "Pressed 'a': Move light left" << endl;
+        //    cout << "ly: " << ly << " lx: " << lx << endl;
+        //    display();
+        //}
+        //if (key == 'l') {
+        //    lx += 10.0; // move the light right
+        //    cout << "Pressed 'd': Move light right" << endl;
+        //    cout << "ly: " << ly << " lx: " << lx << endl;
+        //    display();
+        //}
+        //if (key == 'm') {
+        //    alr += 0.1;
+        //    alg += 0.1;
+        //    alb += 0.1;
 
-            cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
-            display();
-        }
-        if (key == 'n') {
-            alr -= 0.1;
-            alg -= 0.1;
-            alb -= 0.1;
-            cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
-            display();
-        }
+        //    cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
+        //    display();
+        //}
+        //if (key == 'n') {
+        //    alr -= 0.1;
+        //    alg -= 0.1;
+        //    alb -= 0.1;
+        //    cout << "alr: " << alr << " alg: " << alg << " alb: " << alb << endl;
+        //    display();
+        //}
     }
     glutPostRedisplay();
 }
