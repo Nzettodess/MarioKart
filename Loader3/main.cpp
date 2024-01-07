@@ -40,6 +40,13 @@ GLfloat lw = 1.0;
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; /* Red diffuse light. */
 GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 }; /* Infinite light location. */
 
+float cloudPositionsX[50];
+float cloudPositionsY[50];
+float cloudPositionsZ[50];
+float scaleCloud[50];
+float angleCloudX[50];
+float angleCloudY[50];
+
 chrono::high_resolution_clock::time_point lastTime;
 float deltaTime = 0.0f, totalTime = 10000.0f;
 bool game_over = false;
@@ -97,7 +104,7 @@ int score = 0;
 double rotate_x = 0, rotate_y = 0;
 GLuint texture, texture1, texture2, texture3; //the array for our texture
 
-Model model, clocks, building, player, player1, player2, tree, background;
+Model model, clocks, building, player, player1, player2, tree, background, cloud;
 Model mario, kart, mtire;
 GLuint LoadTexture(const char* filename, int width, int	height)
 {
@@ -429,6 +436,63 @@ void drawMap(void)
         }
     }
 }
+
+void drawCloud() {
+    
+    for (int i = 0; i < 25; ++i) {
+        glPushMatrix();
+        glColor3f(1.0f, 1.0f, 1.0f);
+        cloud.draw(cloudPositionsX[i], cloudPositionsY[i], cloudPositionsZ[i], scaleCloud[i], angleCloudX[i], angleCloudY[i], 0.0);
+        glPopMatrix();
+    }
+    
+}
+void cloudPosition(void) {
+    // Seed for the random number generator
+    srand(time(NULL));
+    int cloudCount = 0;
+    //int clockCount = 0;
+    while (cloudCount < 25)
+    {
+        int i = rand() % MAP_SIZE;
+        int j = rand() % MAP_SIZE;
+        int p = rand() % 100;
+        int posy = rand() % 15 + 20;
+        int anglex = rand() % 180;
+        int angley = rand() % 180;
+        if (gameMap[i][j] == 1 && p > 3)
+        {
+            cloudPositionsZ[cloudCount] = j * 5.0 + 0.5; // Adjust for cube size
+            cloudPositionsX[cloudCount] = i * 5.0 + 0.5; // Adjust for cube size
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 2; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+            
+            cloudCount++;
+        }
+        else if (gameMap[i][j] == 2 && p <= 30)
+        {
+            cloudPositionsZ[cloudCount] = j * 2.0 + 0.5;
+            cloudPositionsX[cloudCount] = i * 2.0 + 0.5;
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 1; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+            cloudCount++;
+        }
+        else if (gameMap[i][j] == 3 && p <= 3)
+        {
+            cloudPositionsZ[cloudCount] = j * 1.0 + 0.5;
+            cloudPositionsX[cloudCount] = i * 1.0 + 0.5;
+            cloudPositionsY[cloudCount] = posy; // Adjust for cube size
+            scaleCloud[cloudCount] = 2.5; // Adjust for cube size
+            angleCloudX[cloudCount] = anglex; // Adjust for cube size
+            angleCloudY[cloudCount] = angley; // Adjust for cube size
+            cloudCount++;
+        }
+    }
+}
 void drawBackground(void)
 {
     glPushMatrix();
@@ -437,9 +501,10 @@ void drawBackground(void)
     glBindTexture(GL_TEXTURE_2D, texture3);
     wall();
     glBindTexture(GL_TEXTURE_2D, texture2);*/
-    glColor3f(0.0, 0.0, 0.0);
+    //glColor3f(0.53, 0.81, 0.92);
+    glColor3f(0.0, 0.7, 1.000);
 
-    background.draw(50, 0, 50, 1000, 0.0, 0.0, 0.0);
+    background.draw(150, -50, 150, 190, 0.0, 0.0, 0.0);
     glPopMatrix();
 }
 void renderScore(void)
@@ -514,6 +579,7 @@ void mouseMovement(int x, int y)
 void init() {
     cubepositions();
     buildPosition();
+    cloudPosition();
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -553,16 +619,27 @@ void init() {
 
     model.load("Models/Interactive Object/Coins/Bells.obj");
     clocks.load("Models/Interactive Object/clock/clockpickup.obj");
+
     //building.load("Models/Building/FTMK Building/FTMK.obj"); // need scale
     building.load("Models/Building/FTMK Building/1.obj"); // need scale
+
     player.load("Models/Mario Kart/Mario Kart by Sets/MarioKart/mk_kart.obj");
     player1.load("Models/Mario Kart/Mario Kart by Sets/Browser/kk_kart.obj");
     player2.load("Models/Mario Kart/Mario Kart by Sets/Peach/pk_kart.obj");
+
     tree.load("Models/Environments/Tree/Lowpoly_Tree.obj");
+    //tree.load("Models/Environments/Bush/bush.obj");
+
+    cloud.load("Models/Environments/Cloud/cloud.obj");
+   
+
     mario.load("Models/Mario Kart/Mario Kart by Parts/Drivers/Mario/untitled.obj");
     kart.load("Models/Mario Kart/Mario Kart by Parts/Karts without tires/Standard MR/untitled.obj");
     mtire.load("Models/Mario Kart/Mario Kart by Parts/Tires/Medium/kart_tire_M.obj");
-    //background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
+
+
+    background.load("Models/Background/Texture Background Sky 1365x768/untitled.obj");
+    //background.load("Models/Background/LowPoly Background/LowPolyNew.obj");
 
     pos_x = model.pos_x;
     pos_y = model.pos_y;
@@ -589,6 +666,14 @@ void display() {
     GLfloat Lightbuilding[] = { lx, 291, 1.0, 1.0 };
     glLightfv(GL_LIGHT2, GL_POSITION, LightPosition);
 
+
+
+
+
+    //glEnable(GL_FOG);
+    //glFogi(GL_FOG_MODE, GL_EXP);
+    //glFogf(GL_FOG_DENSITY, 0.1);  // Adjust fog density
+
     //GLfloat global_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
 
@@ -600,6 +685,7 @@ void display() {
     drawClock();
     drawBackground();
     renderScore();
+    drawCloud();
 
     angle++;
 
@@ -627,11 +713,11 @@ void keyboard(unsigned char key, int x, int y)
         }
         if (key == 'd')
         {
-            rotate_y -= 3.0;
+            rotate_y -= 9.0;
         }
         if (key == 'a')
         {
-            rotate_y += 3.0;
+            rotate_y += 9.0;
         }
         if (key == 'e')
         {
